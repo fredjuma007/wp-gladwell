@@ -1,0 +1,25 @@
+.gladwell-box {
+  width: 350px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.gladwell-box #g-out {
+  min-height: 100px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin-bottom: 5px;
+  background: #f9f9f9;
+  overflow-y: auto;
+}
+
+.gladwell-box #g-in {
+  width: calc(100% - 60px);
+  padding: 5px;
+}
+
+.gladwell-box #g-send {
+  width: 50px;
+  padding: 5px;
+}
