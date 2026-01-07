@@ -1,25 +1,239 @@
-.gladwell-box {
-  width: 350px;
-  border: 1px solid #ddd;
-  padding: 10px;
-  font-family: Arial, sans-serif;
+/* Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
+
+:root {
+  --gw-primary: #4f46e5;
+  --gw-secondary: #818cf8;
+  --gw-accent: #c084fc;
+  --gw-dark: #1e293b;
+  --gw-light: #f8fafc;
+  --gw-glass: rgba(255, 255, 255, 0.8);
+  --gw-glass-border: rgba(255, 255, 255, 0.5);
+  --gw-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-.gladwell-box #g-out {
-  min-height: 100px;
-  border: 1px solid #ccc;
-  padding: 5px;
-  margin-bottom: 5px;
-  background: #f9f9f9;
+/* Reset for widget */
+.gladwell-widget * {
+  box-sizing: border-box;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Floating Trigger Button */
+.gladwell-trigger {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, var(--gw-primary), var(--gw-accent));
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 9999;
+}
+
+.gladwell-trigger:hover {
+  transform: scale(1.1);
+}
+
+.gladwell-trigger svg {
+  width: 30px;
+  height: 30px;
+  max-width: 30px;
+  max-height: 30px;
+  fill: white;
+  transition: transform 0.3s ease;
+}
+
+.gladwell-trigger.open svg {
+  transform: rotate(90deg);
+}
+
+/* Chat Window */
+.gladwell-chat-window {
+  position: fixed;
+  bottom: 100px;
+  left: 30px;
+  width: 380px;
+  height: 600px;
+  max-height: calc(100vh - 120px);
+  background: var(--gw-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--gw-glass-border);
+  border-radius: 24px;
+  box-shadow: var(--gw-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9999;
+}
+
+.gladwell-chat-window.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+/* Header */
+.gladwell-header {
+  padding: 20px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gladwell-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gw-primary), var(--gw-accent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.gladwell-info h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gw-dark);
+}
+
+.gladwell-info span {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gladwell-info span::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Messages Area */
+.gladwell-messages {
+  flex: 1;
+  padding: 20px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scrollbar-width: thin;
 }
 
-.gladwell-box #g-in {
-  width: calc(100% - 60px);
-  padding: 5px;
+.gladwell-message {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: messageIn 0.3s ease forwards;
+  opacity: 0;
+  transform: translateY(10px);
 }
 
-.gladwell-box #g-send {
-  width: 50px;
-  padding: 5px;
+@keyframes messageIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gladwell-message.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--gw-primary), var(--gw-secondary));
+  color: white;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+}
+
+.gladwell-message.bot {
+  align-self: flex-start;
+  background: white;
+  color: var(--gw-dark);
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+/* Input Area */
+.gladwell-footer {
+  padding: 16px;
+  background: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 10px;
+}
+
+.gladwell-input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.gladwell-footer input {
+  width: 100%;
+  padding: 12px 16px;
+  padding-right: 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  transition: all 0.2s;
+  outline: none;
+  background: #f8fafc;
+}
+
+.gladwell-footer input:focus {
+  border-color: var(--gw-primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.gladwell-send-btn {
+  background: transparent;
+  border: none;
+  color: var(--gw-primary);
+  cursor: pointer;
+  padding: 8px;
+  position: absolute;
+  right: 8px;
+  transition: transform 0.2s;
+}
+
+.gladwell-send-btn:hover {
+  transform: scale(1.1);
+}
+
+.gladwell-send-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+/* Error State */
+.gladwell-message.error {
+  background: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fee2e2;
 }

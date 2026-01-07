@@ -76,7 +76,9 @@ add_action('admin_init', function () {
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style(
         'gladwell-css',
-        plugin_dir_url(__FILE__) . 'public/embed.css'
+        plugin_dir_url(__FILE__) . 'public/embed.css',
+        [],
+        time()
     );
 
     wp_enqueue_script(
