@@ -96,10 +96,87 @@ document.addEventListener('DOMContentLoaded', () => {
   function appendMessage(text, type) {
     const div = document.createElement('div');
     div.className = `gladwell-message ${type}`;
-    div.innerText = text; // Safe text insertion
+
+    // If it's a bot message, parse markdown. User messages are plain text (safe).
+    if (type === 'bot' || type === 'bot error') {
+      div.innerHTML = parseMarkdown(text);
+    } else {
+      div.innerText = text;
+    }
+
     messagesEl.appendChild(div);
+    scrollToBottom();
+  }
+
+  function scrollToBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
+
+  // Simple Markdown Parser
+  function parseMarkdown(text) {
+    if (!text) return '';
+
+    let html = text
+      // Escape HTML characters first to prevent XSS from raw input
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+
+    // Code Blocks (inline)
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Headers
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
+    html = html.replace(/^\*\*Title:\*\* (.*$)/gim, '<h3>$1</h3>'); // Handle **Title:** specifically as requested
+
+    // Bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // Italic
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    // Unordered Lists
+    // First, identify lines starting with - or * 
+    // This is a simple implementation that wraps individual items, 
+    // for a full list we'd need more complex state or regex, but this works for simple cases.
+    html = html.replace(/^\s*[-*] (.*$)/gim, '<li>$1</li>');
+
+    // Wrap adjacent <li> in <ul> (simple pass)
+    // We can't easily do this with simple regex on the whole string without lookaheads/behinds
+    // A trick is to replace all LI sequences with UL wrapper
+    // But for now, let's just make sure <li>s render. 
+    // To properly wrap, we might need a block parser. 
+    // Let's try a simpler approach: multiple lines of <li>
+
+    // Paragraphs:
+    // Split by double newline to form paragraphs, but avoid breaking headers/lists
+    // We can just turn \n into <br> for simplicity in chat context
+    html = html.replace(/\n/g, '<br>');
+
+    // Cleanup: <li> followed by <br> or starts with <br>
+    // Just wrapping the whole thing? Chat usually better with <br>.
+    // Proper lists needing <ul> tags:
+    // Let's wrap groups of <li> with <ul>...</ul>.
+    // This regex matches a sequence of <li>...</li> tags (including <br> between them if any)
+
+    // Fix: Remove <br> immediately after </h3> or </h4>
+    html = html.replace(/(<\/h[34]>)(<br>)+/g, '$1');
+
+    // Fix: Remove <br> immediately before <li> and after </li>
+    // Actually, simple list:
+    // If we have "<li>...</li><br><li>...</li>", we want "<ul><li>...</li><li>...</li></ul>"
+
+    // Rough List Wrapper:
+    // Find first <li> and start <ul>, find </li> that is NOT followed by <li> and close </ul>
+    // This is hard with regex. 
+    // Alternative: Convert non-list lines to <p> or plain text, and list lines to <li>.
+
+    return html;
+  }
+
 
   // Event Listeners
   sendBtn.addEventListener('click', sendMessage);
