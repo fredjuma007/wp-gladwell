@@ -40,7 +40,9 @@ function gladwell_settings_page() {
 /* ---------------- SETTINGS ---------------- */
 
 add_action('admin_init', function () {
-    register_setting('gladwell_settings', 'gladwell_groq_key');
+    register_setting('gladwell_settings', 'gladwell_groq_key', [
+        'sanitize_callback' => 'trim'
+    ]);
     register_setting('gladwell_settings', 'gladwell_system_prompt');
 
     add_settings_section(
@@ -54,7 +56,7 @@ add_action('admin_init', function () {
         'gladwell_groq_key',
         'Groq API Key',
         function () {
-            echo '<input type="password" class="regular-text" name="gladwell_groq_key" value="' . esc_attr(get_option('gladwell_groq_key')) . '">';
+            echo '<input type="text" class="regular-text" style="width: 100%; max-width: 600px;" name="gladwell_groq_key" value="' . esc_attr(get_option('gladwell_groq_key')) . '" autocomplete="off">';
         },
         'gladwell-ai',
         'gladwell_section'
