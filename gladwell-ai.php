@@ -1,9 +1,12 @@
 <?php
 /**
  * Plugin Name: Gladwell AI
- * Description: Groq-powered AI assistant
+ * Plugin URI:  https://github.com/fredjuma007/wp-gladwell
+ * Description: A premium, Groq-powered AI assistant with a glassmorphism UI.
  * Version: 1.0.0
  * Author: Fred Juma
+ * Author URI:  https://jumaportfolio.netlify.app/
+ * Update URI:  false
  */
 
 if (!defined('ABSPATH')) exit;
@@ -151,3 +154,66 @@ function gladwell_chat() {
 
     wp_send_json_success(['reply' => $body['choices'][0]['message']['content']]);
 }
+
+/* ---------------- CUSTOM DETAILS MODAL ---------------- */
+
+add_filter('plugin_row_meta', function ($links, $file) {
+    if ($file === plugin_basename(__FILE__)) {
+        $url = add_query_arg(
+            [
+                'tab'       => 'plugin-information',
+                'plugin'    => 'gladwell-ai',
+                'TB_iframe' => 'true',
+                'width'     => '600',
+                'height'    => '550'
+            ],
+            self_admin_url('plugin-install.php')
+        );
+        $links[] = '<a href="' . esc_url($url) . '" class="thickbox open-plugin-details-modal" aria-label="More information about Gladwell AI" data-title="Gladwell AI">View details</a>';
+    }
+    return $links;
+}, 10, 2);
+
+add_filter('plugins_api', function ($res, $action, $args) {
+    if ($action !== 'plugin_information') return $res;
+    if (!isset($args->slug) || $args->slug !== 'gladwell-ai') return $res;
+
+    $res = new stdClass();
+    $res->name = 'Gladwell AI';
+    $res->slug = 'gladwell-ai';
+    $res->version = '1.0.0';
+    $res->author = '<a href="https://jumaportfolio.netlify.app/">Fred Juma</a>';
+    $res->author_profile = 'https://jumaportfolio.netlify.app/';
+    $res->homepage = 'https://github.com/fredjuma007/wp-gladwell';
+    $res->requires = '5.0';
+    $res->tested = '6.7';
+    $res->requires_php = '7.4';
+    $res->last_updated = date('Y-m-d H:i:s');
+    
+    $res->sections = [
+        'description' => '<h2>The Future of WordPress Chat 🚀</h2>
+                          <p><strong>Turn your WordPress site into an intelligent, interactive experience with Gladwell AI.</strong></p>
+                          <p>Gladwell AI isn\'t just another chatbot. It\'s a premium, high-performance AI assistant powered by the lightning-fast <strong>Groq</strong> engine (Llama 3). Designed with a focus on aesthetics and speed.</p>
+                          <h3>✨ Why Gladwell AI?</h3>
+                          <ul>
+                            <li><strong>⚡ Ultra-Fast:</strong> Powered by Llama-3 on Groq.</li>
+                            <li><strong>🎨 Stunning Design:</strong> Premium glassmorphism UI.</li>
+                            <li><strong>🛠️ Easy Setup:</strong> Plug & play configuration.</li>
+                          </ul>
+                          <h3>👨‍💻 Meet the Creator: Fred Juma</h3>
+                          <p>Fred is a Full Stack Developer crafting beautiful software.</p>
+                          <p><a href="https://jumaportfolio.netlify.app/" target="_blank" class="button-primary">View My Portfolio</a></p>',
+        
+        'installation' => '<h3>Installation</h3>
+                           <ol>
+                             <li>Download the <code>gladwell-ai.zip</code>.</li>
+                             <li>Upload to Plugins > Add New.</li>
+                             <li>Activate and set your API Key in Settings > Gladwell AI.</li>
+                           </ol>',
+                           
+        'faq'          => '<h3>Is it free?</h3><p>The plugin is free, but you need a Groq API key (currently free/low cost).</p>',
+        'changelog'    => '<h4>1.0.0</h4><ul><li>Initial Release</li><li>Glassmorphism UI</li><li>Groq Integration</li></ul>'
+    ];
+
+    return $res;
+}, 20, 3);
